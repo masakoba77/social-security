@@ -1,0 +1,356 @@
+<!doctype html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>日本の社会保障を読む</title>
+<meta name="description" content="日本の社会保障給付費の推移と、少子高齢化が財政に与える影響をデータで解説するサイト。">
+<link rel="stylesheet" href="assets/style.css">
+</head>
+<body>
+
+<div class="wrap">
+  <header class="hero">
+    <div class="eyebrow">日本の財政を読む</div>
+    <h1>社会保障は、なぜ膨らみ続けるのか</h1>
+    <p class="lead">
+      年金・医療・介護・福祉からなる日本の社会保障給付費は、この50年でおよそ39倍に拡大し、
+      国の一般会計歳出の3割超を占めるまでになりました。急速な少子高齢化を背景に、
+      制度の中身と財源、そして持続可能性をめぐる論点を公表データに基づいて整理しました。
+    </p>
+    <div class="updated">
+      データ基準：2024年度実績・令和8年度（2026年度）当初予算　最終更新：2026年9月
+      <span id="live-status" class="live-status">e-Statから最新データを取得中…</span>
+    </div>
+
+    <div class="stat-grid">
+      <div class="stat-tile">
+        <div class="label" id="stat-benefit-label">社会保障給付費（2024年度）</div>
+        <div class="value" id="stat-benefit-value">138.3兆円</div>
+        <div class="delta" id="stat-benefit-delta">1970年度比 約39倍</div>
+      </div>
+      <div class="stat-tile">
+        <div class="label">対国民所得比</div>
+        <div class="value" id="stat-ratio-value">約30.6%</div>
+      </div>
+      <div class="stat-tile">
+        <div class="label">一般会計歳出に占める割合</div>
+        <div class="value">約31.9%</div>
+      </div>
+      <div class="stat-tile">
+        <div class="label" id="stat-aging-label">高齢化率（65歳以上人口割合）</div>
+        <div class="value" id="stat-aging-value">約29.3%</div>
+      </div>
+    </div>
+
+    <nav class="toc">
+      <a href="#trend">給付費の推移</a>
+      <a href="#inside">給付費の内訳</a>
+      <a href="#position">国の予算に占める位置づけ</a>
+      <a href="#aging">少子高齢化の進行</a>
+      <a href="#funding">財源はどこから</a>
+      <a href="#issues">論点</a>
+      <a href="#board">掲示板</a>
+      <a href="#sources">データソース</a>
+    </nav>
+  </header>
+
+  <section id="trend">
+    <h2>社会保障給付費の推移</h2>
+    <p class="section-note">
+      社会保障給付費（年金・医療・福祉その他の合計）は1970年度の3.5兆円から一貫して増加を続け、
+      2024年度には138.3兆円に達しました。特に高齢化が加速した2000年代以降、増加ペースは高止まりしています。
+    </p>
+    <div class="chart-card">
+      <div class="chart-title">社会保障給付費の推移（実績ベース）<span class="live-badge" id="trend-badge"></span></div>
+      <div class="chart-sub">単位：兆円</div>
+      <svg role="img" aria-label="社会保障給付費の推移"></svg>
+      <button class="table-toggle" type="button">表で見る</button>
+      <table class="data-table">
+        <thead><tr><th>年度</th><th>金額（億円）</th><th>前回比</th></tr></thead>
+        <tbody id="trend-table"></tbody>
+      </table>
+    </div>
+    <div class="callout">
+      2020年度はコロナ禍による給付の上乗せとGDPの落ち込みが重なり、対国民所得比が一時的に上昇しました。
+      増加額の絶対水準は年々大きくなっている一方、伸び率そのものは経済成長や制度改正により変動しています。
+    </div>
+  </section>
+
+  <section id="inside">
+    <h2>給付費の内訳：何に使われているか</h2>
+    <p class="section-note">
+      138.3兆円の内訳は、年金が最大の4割超を占め、医療が3割強、介護・子育て・生活保護・雇用対策などの
+      「福祉その他」が3割弱を占めています。高齢化に伴い、近年は医療・介護費の伸びが年金の伸びを上回る傾向にあります。
+    </p>
+    <div class="chart-card">
+      <div class="chart-title" id="inside-title">社会保障給付費の内訳（2024年度）<span class="live-badge" id="inside-badge"></span></div>
+      <div class="chart-sub" id="inside-sub">単位：億円（総額：138.3兆円）</div>
+      <svg role="img" aria-label="社会保障給付費の内訳"></svg>
+      <button class="table-toggle" type="button">表で見る</button>
+      <table class="data-table">
+        <thead><tr><th>区分</th><th>金額（億円）</th><th>構成比</th></tr></thead>
+        <tbody id="inside-table"></tbody>
+      </table>
+    </div>
+  </section>
+
+  <section id="position">
+    <h2>国の予算全体における社会保障費の位置づけ</h2>
+    <p class="section-note">
+      令和8年度の一般会計歳出総額は122兆3,000億円。社会保障関係費はその31.9%を占め、
+      国債費・地方交付税交付金等・防衛関係費などを上回る、歳出項目の中で最大の割合です。
+    </p>
+    <div class="chart-card">
+      <div class="chart-title">令和8年度 一般会計歳出　主要経費別内訳</div>
+      <div class="chart-sub">単位：億円（全体：122兆3,000億円）</div>
+      <svg role="img" aria-label="令和8年度一般会計歳出の主要経費別内訳"></svg>
+      <div class="legend">
+        <span class="item"><span class="swatch" style="background:var(--series-1)"></span>社会保障関係費</span>
+        <span class="item"><span class="swatch" style="background:var(--series-neutral)"></span>その他の経費</span>
+      </div>
+      <button class="table-toggle" type="button">表で見る</button>
+      <table class="data-table">
+        <thead><tr><th>経費区分</th><th>金額（億円）</th><th>構成比</th></tr></thead>
+        <tbody id="position-table"></tbody>
+      </table>
+    </div>
+    <div class="callout">
+      ここでの「社会保障関係費」（39兆556億円）は国の一般会計から支出される公费負担分のみを指し、
+      保険料収入を含む「社会保障給付費」（138.3兆円）とは範囲が異なります。給付費全体のうち、
+      国の一般会計が直接負担しているのは3割弱にとどまります。
+    </div>
+  </section>
+
+  <section id="aging">
+    <h2>少子高齢化の進行</h2>
+    <p class="section-note">
+      社会保障給付費が拡大し続けている最大の要因は、急速な高齢化です。65歳以上人口が総人口に占める割合（高齢化率）は
+      1970年の7.1%から2024年には29.3%まで上昇し、世界でも最高水準にあります。
+    </p>
+    <div class="chart-card">
+      <div class="chart-title">高齢化率の推移<span class="live-badge" id="aging-badge"></span></div>
+      <div class="chart-sub">単位：%（65歳以上人口 / 総人口）</div>
+      <svg role="img" aria-label="高齢化率の推移"></svg>
+      <button class="table-toggle" type="button">表で見る</button>
+      <table class="data-table">
+        <thead><tr><th>年</th><th>高齢化率</th><th>備考</th></tr></thead>
+        <tbody id="aging-table"></tbody>
+      </table>
+    </div>
+    <div class="callout">
+      高齢者を支える現役世代（15〜64歳）の人数は、1970年の「約9.8人で1人」から近年は
+      「約2.0人で1人」まで縮小しました。国立社会保障・人口問題研究所の推計では、2040年頃には
+      「約1.5人で1人」を支える構図になるとされ、現役世代1人あたりの負担は今後も重くなる見通しです。
+    </div>
+  </section>
+
+  <section id="funding" class="prose">
+    <h2>社会保障の財源はどこから来るのか</h2>
+    <p class="section-note">
+      社会保障給付費は、主に「保険料」と「公费（税金）」の2つを財源としており、
+      高齢化による給付の増加分を、現役世代の保険料と国・地方の税収でどう分担するかが制度運営の核心です。
+    </p>
+    <div class="pillars">
+      <div class="pillar"><div class="n">1</div>社会保険料<br>労使折半で負担する年金・医療・介護保険料など。財源の中心だが、少子化で現役世代の負担が重くなりやすい</div>
+      <div class="pillar"><div class="n">2</div>公费負担（国）<br>国の一般会計から投入される税財源。令和8年度は39兆556億円で、歳出全体の最大項目</div>
+      <div class="pillar"><div class="n">3</div>公费負担（地方）<br>都道府県・市町村が負担する分。国民健康保険や介護保険の一部などに充てられる</div>
+      <div class="pillar"><div class="n">4</div>積立金の運用収益等<br>年金積立金（GPIF運用）の収益や資産収入。給付を下支えするが、市場変動の影響を受ける</div>
+    </div>
+    <p>
+      国の公费負担分は税収だけでは賄いきれず、国債発行に頼っている部分があります。
+      その結果、現在の給付の一部が将来世代の負担（国債の償還）に先送りされている構造になっている点が、
+      財政健全化の議論でたびたび指摘されています。
+    </p>
+  </section>
+
+  <section id="issues" class="prose">
+    <h2>社会保障をめぐる主な論点</h2>
+    <p class="section-note">立場によって評価が分かれるポイントを、事実関係を中心に整理しました。</p>
+    <ul>
+      <li><strong>現役世代の負担増</strong>：少子化で保険料を支える現役世代が減る一方、給付を受ける高齢者は増え続けており、現役世代1人あたりの保険料・税負担は年々重くなっています。</li>
+      <li><strong>医療・介護費の伸び</strong>：高齢化に伴い、これまで給付の中心だった年金に加え、医療・介護給付の伸びが目立つようになっており、地域医療・介護人材の確保も課題です。</li>
+      <li><strong>年金の実質価値</strong>：「マクロ経済スライド」により、少子高齢化の進行に応じて年金の伸びを物価・賃金上昇より抑える仕組みが導入されていますが、現役世代の受給時の給付水準低下への懸念があります。</li>
+      <li><strong>全世代型社会保障改革</strong>：高齢者中心だった給付を子育て・現役世代にも拡充する「全世代型社会保障」への転換が進められていますが、財源をどう確保するかが議論の焦点です。</li>
+      <li><strong>財源の持続可能性</strong>：公费負担分の一部が国債発行で賄われており、給付を維持するほど将来世代への負担の先送りが拡大するとの指摘があります。</li>
+    </ul>
+  </section>
+
+  <section id="board">
+    <h2>掲示板</h2>
+    <p class="section-note">
+      このサイトの内容や社会保障のあり方について、ご意見・ご感想をお寄せください（Disqusによる外部埋め込みです。GitHubアカウントは不要、匿名でも投稿できます）。
+    </p>
+    <div id="disqus_thread"></div>
+    <p id="disqus-setup-notice" class="callout" hidden>
+      掲示板を有効にするには、<code>assets/disqus.js</code> の <code>DISQUS_SHORTNAME</code> に
+      <a href="https://disqus.com/admin/create/" target="_blank" rel="noopener">disqus.com</a>で発行したshortnameを設定してください。
+    </p>
+  </section>
+
+  <footer id="sources">
+    <strong style="color:var(--text-secondary)">データソース</strong>
+    <ul class="sources">
+      <li><a href="https://www.e-stat.go.jp/dbview?sid=0004050708" target="_blank" rel="noopener">e-Stat「社会保障費用統計 社会保障給付費の部門別推移」（厚生労働省・IPSS、API連携元）</a></li>
+      <li><a href="https://www.e-stat.go.jp/dbview?sid=0003448226" target="_blank" rel="noopener">e-Stat「人口推計 年齢（3区分）別人口の割合」（総務省統計局、API連携元）</a></li>
+      <li><a href="https://www.ipss.go.jp/ss-cost/j/data.asp" target="_blank" rel="noopener">国立社会保障・人口問題研究所（IPSS）「社会保障費用統計」</a></li>
+      <li><a href="https://www.mhlw.go.jp/" target="_blank" rel="noopener">厚生労働省（社会保障制度の概要・予算資料）</a></li>
+      <li><a href="https://www.mof.go.jp/tax_policy/summary/condition/002.pdf" target="_blank" rel="noopener">財務省「日本の財政関係資料」（一般会計歳出内訳）</a></li>
+      <li><a href="https://www.stat.go.jp/data/jinsui/" target="_blank" rel="noopener">総務省統計局「人口推計」</a></li>
+      <li><a href="https://www8.cao.go.jp/kourei/whitepaper/index-w.html" target="_blank" rel="noopener">内閣府「高齢社会白書」</a></li>
+    </ul>
+    <div class="disclaimer">
+      本サイトは公開統計をもとに作成した参考情報であり、政府・特定の立場を代表するものではありません。
+      「社会保障給付費」の推移・内訳・高齢化率のグラフは、ページ表示時にe-Stat（政府統計の総合窓口）APIから
+      最新の公表値を自動取得しています（取得できない場合は保存済みの数値を表示します）。
+      「社会保障給付費」は年度により集計方法の見直しが行われる場合があり、また「社会保障関係費」（国の一般会計予算項目）とは
+      集計範囲が異なります。正確な数値・定義は各出典の一次資料をご確認ください。
+    </div>
+  </footer>
+</div>
+
+<script src="assets/data.js"></script>
+<script src="assets/estat-config.js"></script>
+<script src="assets/estat-client.js"></script>
+<script src="assets/live-data.js"></script>
+<script src="assets/charts.js"></script>
+<script src="assets/disqus.js"></script>
+<script>
+(function () {
+  function renderTrend(d) {
+    const card = document.getElementById("trend").querySelector(".chart-card");
+    Charts.renderVerticalBar(card, d.benefitTrend, {
+      valueKey: "oku",
+      color: () => "var(--series-1)",
+      axisFormat: (v) => Charts.fmtOku(v),
+      tooltip: (row) => `${Charts.fmtOku(row.oku)}（${row.oku.toLocaleString("ja-JP")}億円）<br>${row.note}`,
+      directLabel: (row) => (row.oku / 10000).toLocaleString("ja-JP", { maximumFractionDigits: 1 }) + "兆円",
+    });
+    document.getElementById("trend-table").innerHTML = d.benefitTrend.map((row) =>
+      `<tr><td>${row.label}年度</td><td>${row.oku.toLocaleString("ja-JP")}</td><td>${row.note || "-"}</td></tr>`
+    ).join("");
+    Charts.wireTableToggle(card, card.querySelector(".data-table"));
+  }
+
+  function renderInside(d) {
+    const card = document.getElementById("inside").querySelector(".chart-card");
+    Charts.renderHorizontalBar(card, d.costBreakdown, {
+      valueKey: "oku",
+      color: (row, i) => ["var(--series-1)", "var(--series-2)", "var(--series-neutral)"][i] || "var(--series-neutral)",
+      tooltip: (row) => `${row.detail}<br>${Charts.fmtOku(row.oku)}（${row.oku.toLocaleString("ja-JP")}億円）・全体の${row.pct}%`,
+      directLabel: (row) => `${row.pct}%`,
+      labelWidth: 120,
+    });
+    document.getElementById("inside-table").innerHTML = d.costBreakdown.map((row) =>
+      `<tr><td>${row.label}（${row.detail}）</td><td>${row.oku.toLocaleString("ja-JP")}</td><td>${row.pct}%</td></tr>`
+    ).join("");
+    Charts.wireTableToggle(card, card.querySelector(".data-table"));
+
+    const yearLabel = d.benefitTotalLatestYear ? `${d.benefitTotalLatestYear}年度` : "";
+    document.getElementById("inside-title").firstChild.textContent = `社会保障給付費の内訳（${yearLabel}）`;
+    document.getElementById("inside-sub").textContent =
+      `単位：億円（総額：${Charts.fmtOku(d.benefitTotalLatest)}）`;
+  }
+
+  function renderPosition(d) {
+    const card = document.getElementById("position").querySelector(".chart-card");
+    const sorted = [...d.budgetBreakdown].sort((a, b) => b.oku - a.oku);
+    Charts.renderHorizontalBar(card, sorted, {
+      valueKey: "oku",
+      color: (row) => (row.highlight ? "var(--series-1)" : "var(--series-neutral)"),
+      tooltip: (row) => `${Charts.fmtOku(row.oku)}（${row.oku.toLocaleString("ja-JP")}億円）<br>全体の${row.pct}%`,
+      directLabel: (row) => `${row.pct}%`,
+      labelWidth: 190,
+    });
+    document.getElementById("position-table").innerHTML = sorted.map((row) =>
+      `<tr><td>${row.label}</td><td>${row.oku.toLocaleString("ja-JP")}</td><td>${row.pct}%</td></tr>`
+    ).join("");
+    Charts.wireTableToggle(card, card.querySelector(".data-table"));
+  }
+
+  function renderAging(d) {
+    const card = document.getElementById("aging").querySelector(".chart-card");
+    Charts.renderVerticalBar(card, d.agingRate, {
+      valueKey: "pct",
+      color: () => "var(--series-2)",
+      axisFormat: (v) => v.toLocaleString("ja-JP") + "%",
+      tooltip: (row) => `${Charts.fmtPct(row.pct)}${row.note ? "<br>" + row.note : ""}`,
+      directLabel: (row) => Charts.fmtPct(row.pct),
+    });
+    document.getElementById("aging-table").innerHTML = d.agingRate.map((row) =>
+      `<tr><td>${row.label}年</td><td>${row.pct}%</td><td>${row.note || "-"}</td></tr>`
+    ).join("");
+    Charts.wireTableToggle(card, card.querySelector(".data-table"));
+  }
+
+  function renderStatTiles(d) {
+    const first = d.benefitTrend[0];
+    const latestOku = d.benefitTotalLatest;
+    document.getElementById("stat-benefit-label").textContent =
+      `社会保障給付費（${d.benefitTotalLatestYear}年度）`;
+    document.getElementById("stat-benefit-value").textContent = Charts.fmtOku(latestOku);
+    if (first) {
+      const multiple = Math.round((latestOku / first.oku) * 10) / 10;
+      document.getElementById("stat-benefit-delta").textContent = `${first.label}年度比 約${multiple}倍`;
+    }
+    if (d.nationalIncomeRatioLatest != null) {
+      document.getElementById("stat-ratio-value").textContent = `約${d.nationalIncomeRatioLatest}%`;
+    }
+    const latestAging = d.agingRate[d.agingRate.length - 1];
+    if (latestAging) {
+      document.getElementById("stat-aging-label").textContent = `高齢化率（65歳以上人口割合、${latestAging.label}年）`;
+      document.getElementById("stat-aging-value").textContent = `約${latestAging.pct}%`;
+    }
+  }
+
+  function setBadge(id, sourceLabel) {
+    const el = document.getElementById(id);
+    if (!el) return;
+    if (sourceLabel === "live") {
+      el.textContent = "e-Statから自動取得";
+      el.className = "live-badge live-badge--live";
+    } else {
+      el.textContent = "保存済みデータ";
+      el.className = "live-badge live-badge--fallback";
+    }
+  }
+
+  function updateLiveStatus(sections) {
+    const el = document.getElementById("live-status");
+    if (!el) return;
+    const allLive = sections.benefit === "live" && sections.aging === "live";
+    const allFallback = sections.benefit !== "live" && sections.aging !== "live";
+    if (allLive) {
+      el.textContent = "e-Statから最新データを取得しました";
+      el.className = "live-status live-status--live";
+    } else if (allFallback) {
+      el.textContent = "e-Statに接続できなかったため、保存済みデータを表示しています";
+      el.className = "live-status live-status--fallback";
+    } else {
+      el.textContent = "一部のグラフはe-Statから、一部は保存済みデータを表示しています";
+      el.className = "live-status live-status--partial";
+    }
+  }
+
+  // 初期描画：即座に保存済みデータ(DATA)で描画し、体感速度を確保する
+  renderTrend(DATA);
+  renderInside(DATA);
+  renderPosition(DATA);
+  renderAging(DATA);
+  renderStatTiles(DATA);
+
+  // e-Statからのライブ取得が終わり次第、取得できた範囲だけ描画し直す
+  LiveData.load().then(({ data, sections }) => {
+    renderTrend(data);
+    renderInside(data);
+    renderAging(data);
+    renderStatTiles(data);
+    setBadge("trend-badge", sections.benefit);
+    setBadge("inside-badge", sections.benefit);
+    setBadge("aging-badge", sections.aging);
+    updateLiveStatus(sections);
+  });
+})();
+</script>
+</body>
+</html>
