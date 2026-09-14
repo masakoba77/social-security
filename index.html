@@ -414,12 +414,14 @@
 
     if (results.length === 0) {
       info.textContent = "検索結果が見つかりません";
+      info.style.color = "var(--text-secondary)";
       info.style.display = "block";
       container.style.display = "none";
       return;
     }
 
     info.textContent = `${results.length}件の検索結果が見つかりました`;
+    info.style.color = "var(--text-secondary)";
     info.style.display = "block";
     list.innerHTML = results.map((result) => {
       const svg = result.hasChart ? getChartSvg(result.section) : null;
@@ -427,7 +429,7 @@
       return `
       <div style="padding: 12px; border: 1px solid var(--border); border-radius: 6px; background: var(--surface); cursor: pointer; transition: background 0.2s;" class="search-result-card" onclick="document.getElementById('${result.section}').scrollIntoView({ behavior: 'smooth' });">
         <div style="font-weight: 600; color: var(--text-primary); margin-bottom: 4px;">${result.title}</div>
-        <div style="font-size: 13px; color: var(--text-muted); line-height: 1.5;">${result.preview}</div>
+        <div style="font-size: 13px; color: var(--text-secondary); line-height: 1.5;">${result.preview}</div>
         ${chartHtml}
       </div>
     `;
