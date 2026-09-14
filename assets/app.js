@@ -29,9 +29,14 @@ function renderTrendTable(trends) {
   const tbody = document.getElementById('trend-tbody');
   tbody.innerHTML = '';
 
-  trends.forEach((d, i) => {
+  // 直近6年のデータのみを表示
+  const recentTrends = trends.slice(-6);
+  const startIndex = trends.length - 6;
+
+  recentTrends.forEach((d, i) => {
     const row = document.createElement('tr');
-    const prevYear = i > 0 ? trends[i - 1].benefit : d.benefit;
+    const actualIndex = startIndex + i;
+    const prevYear = actualIndex > 0 ? trends[actualIndex - 1].benefit : d.benefit;
     const change = ((d.benefit - prevYear) / prevYear * 100).toFixed(1);
 
     row.innerHTML = `
@@ -77,7 +82,10 @@ function renderAgingTable(aging) {
   const tbody = document.getElementById('aging-tbody');
   tbody.innerHTML = '';
 
-  aging.forEach(d => {
+  // 直近5年のデータのみを表示
+  const recentAging = aging.slice(-5);
+
+  recentAging.forEach(d => {
     const row = document.createElement('tr');
     row.innerHTML = `
       <td>${d.year}年</td>
