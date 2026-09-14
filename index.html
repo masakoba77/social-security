@@ -1,0 +1,136 @@
+<!doctype html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>社会保障費と国の予算</title>
+<meta name="description" content="日本の社会保障費と国の予算の関係を動的に可視化します">
+<link rel="stylesheet" href="assets/style.css">
+</head>
+<body>
+
+<div class="container">
+  <header>
+    <h1>社会保障費と国の予算</h1>
+    <p class="subtitle">e-Stat APIから取得した最新データを動的に表示</p>
+  </header>
+
+  <main>
+    <section id="overview">
+      <h2>概要</h2>
+      <div class="stats-grid">
+        <div class="stat-card">
+          <div class="stat-label">社会保障給付費（2024年度）</div>
+          <div class="stat-value" id="benefit-value">読み込み中...</div>
+          <div class="stat-unit">兆円</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-label">一般会計歳出に占める割合</div>
+          <div class="stat-value" id="ratio-value">読み込み中...</div>
+          <div class="stat-unit">%</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-label">高齢化率（65歳以上）</div>
+          <div class="stat-value" id="aging-value">読み込み中...</div>
+          <div class="stat-unit">%</div>
+        </div>
+      </div>
+    </section>
+
+    <section id="trends">
+      <h2>社会保障給付費の推移</h2>
+      <div class="chart-wrapper">
+        <svg id="trend-chart"></svg>
+      </div>
+      <table id="trend-table" class="data-table">
+        <thead>
+          <tr>
+            <th>年度</th>
+            <th>金額（兆円）</th>
+            <th>前年比（%）</th>
+          </tr>
+        </thead>
+        <tbody id="trend-tbody">
+          <tr><td colspan="3">読み込み中...</td></tr>
+        </tbody>
+      </table>
+    </section>
+
+    <section id="breakdown">
+      <h2>給付費の内訳</h2>
+      <div class="chart-wrapper">
+        <svg id="breakdown-chart"></svg>
+      </div>
+      <table id="breakdown-table" class="data-table">
+        <thead>
+          <tr>
+            <th>区分</th>
+            <th>金額（兆円）</th>
+            <th>構成比（%）</th>
+          </tr>
+        </thead>
+        <tbody id="breakdown-tbody">
+          <tr><td colspan="3">読み込み中...</td></tr>
+        </tbody>
+      </table>
+    </section>
+
+    <section id="budget">
+      <h2>国の一般会計における位置づけ</h2>
+      <div class="chart-wrapper">
+        <svg id="budget-chart"></svg>
+      </div>
+      <table id="budget-table" class="data-table">
+        <thead>
+          <tr>
+            <th>経費区分</th>
+            <th>金額（兆円）</th>
+            <th>構成比（%）</th>
+          </tr>
+        </thead>
+        <tbody id="budget-tbody">
+          <tr><td colspan="3">読み込み中...</td></tr>
+        </tbody>
+      </table>
+    </section>
+
+    <section id="aging">
+      <h2>高齢化率の推移</h2>
+      <div class="chart-wrapper">
+        <svg id="aging-chart"></svg>
+      </div>
+      <table id="aging-table" class="data-table">
+        <thead>
+          <tr>
+            <th>年</th>
+            <th>高齢化率（%）</th>
+          </tr>
+        </thead>
+        <tbody id="aging-tbody">
+          <tr><td colspan="2">読み込み中...</td></tr>
+        </tbody>
+      </table>
+    </section>
+
+    <section id="data-source">
+      <h2>データソース</h2>
+      <ul>
+        <li><a href="https://www.e-stat.go.jp/" target="_blank">e-Stat（政府統計の総合窓口）</a></li>
+        <li>厚生労働省「社会保障給付費統計」</li>
+        <li>総務省統計局「人口推計」</li>
+        <li>財務省「日本の財政関係資料」</li>
+      </ul>
+    </section>
+  </main>
+
+  <footer>
+    <p>&copy; 2026 社会保障77. 本サイトは公表統計に基づいた参考情報です。</p>
+  </footer>
+</div>
+
+<script src="assets/data.js"></script>
+<script src="assets/charts.js"></script>
+<script src="assets/app.js"></script>
+
+</body>
+</html>
