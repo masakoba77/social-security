@@ -23,6 +23,23 @@
       <span id="live-status" class="live-status">e-Statから最新データを取得中…</span>
     </div>
 
+    <div style="background: var(--surface-2); padding: 16px; border-radius: 8px; margin-bottom: 24px;">
+      <label for="search-input" style="display: block; margin-bottom: 8px; font-size: 14px; color: var(--text-secondary);">サイト内検索</label>
+      <div style="display: flex; gap: 8px;">
+        <input type="text" id="search-input" placeholder="キーワードを入力..." style="flex: 1; padding: 10px; border: 1px solid var(--border); border-radius: 6px; font-size: 14px;">
+        <button id="search-btn" type="button" style="padding: 10px 16px; background: var(--series-1); color: white; border: none; border-radius: 6px; cursor: pointer; font-size: 14px;">検索</button>
+        <button id="clear-search-btn" type="button" style="padding: 10px 16px; background: var(--surface); color: var(--text-secondary); border: 1px solid var(--border); border-radius: 6px; cursor: pointer; font-size: 14px;">クリア</button>
+      </div>
+      <div id="search-results-info" style="margin-top: 8px; font-size: 13px; color: var(--text-muted); display: none;"></div>
+    </div>
+
+    <div id="search-results-container" style="display: none; background: var(--surface-2); border: 1px solid var(--border); border-radius: 8px; padding: 16px; margin-bottom: 24px;">
+      <div style="margin-bottom: 16px;">
+        <h3 style="margin: 0 0 12px; font-size: 16px; color: var(--text-primary);">検索結果</h3>
+        <div id="search-results-list" style="display: grid; gap: 12px;"></div>
+      </div>
+    </div>
+
     <div class="stat-grid">
       <div class="stat-tile">
         <div class="label" id="stat-benefit-label">社会保障給付費（2024年度）</div>
@@ -331,6 +348,105 @@
       el.className = "live-status live-status--partial";
     }
   }
+
+  // Search functionality
+  const searchIndex = [
+    { id: "trend", title: "社会保障給付費の推移", section: "trend" },
+    { id: "inside", title: "給付費の内訳：何に使われているか", section: "inside" },
+    { id: "position", title: "国の予算に占める位置づけ", section: "position" },
+    { id: "aging", title: "少子高齢化の進行", section: "aging" },
+    { id: "funding", title: "財源はどこから", section: "funding" },
+    { id: "issues", title: "論点", section: "issues" },
+    { id: "board", title: "掲示板", section: "board" },
+    { id: "sources", title: "データソース", section: "sources" },
+  ];
+
+  function getSearchableContent(sectionId) {
+    const el = document.getElementById(sectionId);
+    if (!el) return "";
+    let text = el.textContent || "";
+    return text.trim();
+  }
+
+  function performSearch(query) {
+    if (!query.trim()) {
+      document.getElementById("search-results-container").style.display = "none";
+      document.getElementById("search-results-info").style.display = "none";
+      return [];
+    }
+
+    const q = query.toLowerCase();
+    const results = [];
+
+    for (const item of searchIndex) {
+      const content = getSearchableContent(item.section);
+      const contentLower = content.toLowerCase();
+
+      if (contentLower.includes(q)) {
+        const preview = content.substring(0, 120);
+        const cleanPreview = preview.replace(/\s+/g, " ").trim();
+        results.push({
+          ...item,
+          preview: cleanPreview.length < content.length ? cleanPreview + "…" : cleanPreview,
+          relevance: (contentLower.match(new RegExp(q, "g")) || []).length,
+        });
+      }
+    }
+
+    results.sort((a, b) => b.relevance - a.relevance);
+    return results;
+  }
+
+  function renderSearchResults(results) {
+    const container = document.getElementById("search-results-container");
+    const list = document.getElementById("search-results-list");
+    const info = document.getElementById("search-results-info");
+
+    if (results.length === 0) {
+      info.textContent = "検索結果が見つかりません";
+      info.style.display = "block";
+      container.style.display = "none";
+      return;
+    }
+
+    info.textContent = `${results.length}件の検索結果が見つかりました`;
+    info.style.display = "block";
+    list.innerHTML = results.map((result) => `
+      <div style="padding: 12px; border: 1px solid var(--border); border-radius: 6px; background: var(--surface); cursor: pointer; transition: background 0.2s;" class="search-result-card" onclick="document.getElementById('${result.section}').scrollIntoView({ behavior: 'smooth' });">
+        <div style="font-weight: 600; color: var(--text-primary); margin-bottom: 4px;">${result.title}</div>
+        <div style="font-size: 13px; color: var(--text-muted); line-height: 1.5;">${result.preview}</div>
+      </div>
+    `).join("");
+
+    container.style.display = "block";
+
+    document.querySelectorAll(".search-result-card").forEach((card) => {
+      card.addEventListener("mouseover", function () {
+        this.style.background = "var(--surface-2)";
+      });
+      card.addEventListener("mouseout", function () {
+        this.style.background = "var(--surface)";
+      });
+    });
+  }
+
+  function handleSearch() {
+    const query = document.getElementById("search-input").value;
+    const results = performSearch(query);
+    renderSearchResults(results);
+  }
+
+  function handleClear() {
+    document.getElementById("search-input").value = "";
+    document.getElementById("search-results-container").style.display = "none";
+    document.getElementById("search-results-info").style.display = "none";
+  }
+
+  document.getElementById("search-btn").addEventListener("click", handleSearch);
+  document.getElementById("clear-search-btn").addEventListener("click", handleClear);
+  document.getElementById("search-input").addEventListener("keypress", function (e) {
+    if (e.key === "Enter") handleSearch();
+  });
 
   // 初期描画：即座に保存済みデータ(DATA)で描画し、体感速度を確保する
   renderTrend(DATA);
