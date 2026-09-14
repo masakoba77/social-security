@@ -351,14 +351,14 @@
 
   // Search functionality
   const searchIndex = [
-    { id: "trend", title: "社会保障給付費の推移", section: "trend" },
-    { id: "inside", title: "給付費の内訳：何に使われているか", section: "inside" },
-    { id: "position", title: "国の予算に占める位置づけ", section: "position" },
-    { id: "aging", title: "少子高齢化の進行", section: "aging" },
-    { id: "funding", title: "財源はどこから", section: "funding" },
-    { id: "issues", title: "論点", section: "issues" },
-    { id: "board", title: "掲示板", section: "board" },
-    { id: "sources", title: "データソース", section: "sources" },
+    { id: "trend", title: "社会保障給付費の推移", section: "trend", hasChart: true },
+    { id: "inside", title: "給付費の内訳：何に使われているか", section: "inside", hasChart: true },
+    { id: "position", title: "国の予算に占める位置づけ", section: "position", hasChart: true },
+    { id: "aging", title: "少子高齢化の進行", section: "aging", hasChart: true },
+    { id: "funding", title: "財源はどこから", section: "funding", hasChart: false },
+    { id: "issues", title: "論点", section: "issues", hasChart: false },
+    { id: "board", title: "掲示板", section: "board", hasChart: false },
+    { id: "sources", title: "データソース", section: "sources", hasChart: false },
   ];
 
   function getSearchableContent(sectionId) {
@@ -397,6 +397,16 @@
     return results;
   }
 
+  function getChartSvg(sectionId) {
+    const section = document.getElementById(sectionId);
+    if (!section) return null;
+    const chartCard = section.querySelector(".chart-card");
+    if (!chartCard) return null;
+    const svg = chartCard.querySelector("svg");
+    if (!svg) return null;
+    return svg;
+  }
+
   function renderSearchResults(results) {
     const container = document.getElementById("search-results-container");
     const list = document.getElementById("search-results-list");
@@ -411,12 +421,17 @@
 
     info.textContent = `${results.length}件の検索結果が見つかりました`;
     info.style.display = "block";
-    list.innerHTML = results.map((result) => `
+    list.innerHTML = results.map((result) => {
+      const svg = result.hasChart ? getChartSvg(result.section) : null;
+      const chartHtml = svg ? `<div style="margin-top: 12px; max-height: 200px; overflow: hidden; border-top: 1px solid var(--border); padding-top: 12px;">${svg.outerHTML}</div>` : '';
+      return `
       <div style="padding: 12px; border: 1px solid var(--border); border-radius: 6px; background: var(--surface); cursor: pointer; transition: background 0.2s;" class="search-result-card" onclick="document.getElementById('${result.section}').scrollIntoView({ behavior: 'smooth' });">
         <div style="font-weight: 600; color: var(--text-primary); margin-bottom: 4px;">${result.title}</div>
         <div style="font-size: 13px; color: var(--text-muted); line-height: 1.5;">${result.preview}</div>
+        ${chartHtml}
       </div>
-    `).join("");
+    `;
+    }).join("");
 
     container.style.display = "block";
 
