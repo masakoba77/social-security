@@ -4,9 +4,9 @@ class Chart {
     this.svg = svgElement;
     this.data = data;
     this.options = {
-      width: 800,
-      height: 400,
-      margin: { top: 20, right: 30, bottom: 50, left: 70 },
+      width: 1000,
+      height: 500,
+      margin: { top: 30, right: 40, bottom: 60, left: 80 },
       ...options
     };
     this.clear();
@@ -244,8 +244,8 @@ function renderChart(elementId, data, type, xKey, yKey) {
   if (!svg) return;
 
   const container = svg.parentElement;
-  const width = Math.min(container.offsetWidth, 1000);
-  const height = Math.min(window.innerHeight * 0.5, 500);
+  const width = Math.min(container.offsetWidth, 1200);
+  const height = 600;
 
   svg.setAttribute('width', width);
   svg.setAttribute('height', height);
