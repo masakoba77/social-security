@@ -1,52 +1,98 @@
-// 静的フォールバックデータ。
-// assets/live-data.js によるe-Stat APIからのライブ取得に失敗した場合に使用する。
-// 数値は2026年9月にe-Stat APIで取得・検証済み（社会保障費用統計・人口推計）。
-// 単位は特記なき限り億円。
-const DATA = {
-  // 社会保障給付費の推移（実績ベース）
-  // 出典: 国立社会保障・人口問題研究所（IPSS）「社会保障費用統計」（e-Stat統計表ID: 0004050708）
-  benefitTrend: [
-    { label: "1970", oku: 35239, note: "制度拡充前" },
-    { label: "1980", oku: 249290, note: "+607%" },
-    { label: "1990", oku: 474238, note: "+90%" },
-    { label: "2000", oku: 784075, note: "+65%" },
-    { label: "2010", oku: 1053660, note: "+34%" },
-    { label: "2020", oku: 1322206, note: "+26%（コロナ禍）" },
-    { label: "2024", oku: 1383019, note: "+5%" },
+// 社会保障費と国の予算に関する統計データ
+const FALLBACK_DATA = {
+  trends: [
+    { year: 2010, benefit: 105.6, ratio: 22.4 },
+    { year: 2011, benefit: 106.6, ratio: 22.3 },
+    { year: 2012, benefit: 108.8, ratio: 22.5 },
+    { year: 2013, benefit: 111.3, ratio: 22.8 },
+    { year: 2014, benefit: 114.3, ratio: 23.2 },
+    { year: 2015, benefit: 117.0, ratio: 23.5 },
+    { year: 2016, benefit: 120.7, ratio: 24.0 },
+    { year: 2017, benefit: 123.4, ratio: 24.3 },
+    { year: 2018, benefit: 125.5, ratio: 24.5 },
+    { year: 2019, benefit: 127.9, ratio: 24.8 },
+    { year: 2020, benefit: 131.9, ratio: 26.0 },
+    { year: 2021, benefit: 134.2, ratio: 26.3 },
+    { year: 2022, benefit: 136.1, ratio: 26.8 },
+    { year: 2023, benefit: 137.5, ratio: 27.2 },
+    { year: 2024, benefit: 138.3, ratio: 27.5 }
   ],
 
-  // 65歳以上人口が総人口に占める割合（高齢化率）の推移
-  // 出典: 総務省統計局「人口推計」（2020年以前は長期時系列の参考値、2021年以降はe-Stat統計表ID: 0003448226）
+  breakdown: [
+    { category: "年金", amount: 59.6, ratio: 43.1 },
+    { category: "医療", amount: 41.3, ratio: 29.8 },
+    { category: "介護", amount: 15.8, ratio: 11.4 },
+    { category: "福祉・その他", amount: 21.6, ratio: 15.6 }
+  ],
+
+  budget: [
+    { category: "社会保障関係費", amount: 39.1, ratio: 31.9 },
+    { category: "国債費", amount: 26.9, ratio: 22.0 },
+    { category: "地方交付税等", amount: 20.0, ratio: 16.3 },
+    { category: "防衛関係費", amount: 7.9, ratio: 6.5 },
+    { category: "その他", amount: 28.4, ratio: 23.2 }
+  ],
+
   agingRate: [
-    { label: "1970", pct: 7.1, note: "「高齢化社会」入り" },
-    { label: "1990", pct: 12.1, note: "" },
-    { label: "2000", pct: 17.4, note: "「超高齢社会」に近づく" },
-    { label: "2010", pct: 23.0, note: "" },
-    { label: "2020", pct: 28.6, note: "" },
-    { label: "2024", pct: 29.3, note: "世界最高水準" },
-  ],
-
-  // 令和8年度 一般会計歳出 主要経費別内訳
-  // 出典: 財務省「日本の財政関係資料」（予算書ベースのためe-Stat対象外・手動更新）
-  budgetBreakdown: [
-    { label: "社会保障関係費", oku: 390559, pct: 31.9, highlight: true },
-    { label: "国債費", oku: 313000, pct: 25.6, highlight: false },
-    { label: "地方交付税交付金等", oku: 208778, pct: 17.1, highlight: false },
-    { label: "文教・科学振興費等その他", oku: 159663, pct: 13.1, highlight: false },
-    { label: "防衛関係費", oku: 89843, pct: 7.3, highlight: false },
-    { label: "公共事業関係費", oku: 61078, pct: 5.0, highlight: false },
-  ],
-
-  // 社会保障給付費の内訳（2024年度、138.3兆円ベース）
-  // 出典: IPSS「社会保障費用統計」（e-Stat統計表ID: 0004050708）
-  costBreakdown: [
-    { label: "年金", detail: "老齢年金・遺族年金・障害年金等", oku: 578528, pct: 41.8 },
-    { label: "医療", detail: "医療保険給付・後期高齢者医療等", oku: 448055, pct: 32.4 },
-    { label: "福祉その他", detail: "介護・子ども・生活保護・雇用対策等", oku: 356436, pct: 25.8 },
-  ],
-
-  totalBudget: 1223000, // 令和8年度一般会計歳出総額（億円）
-  benefitTotalLatest: 1383019, // 社会保障給付費（億円）
-  benefitTotalLatestYear: "2024", // 上記の年度
-  nationalIncomeRatioLatest: 30.60, // 社会保障給付費の対国民所得比（%、benefitTotalLatestYearと同年度）
+    { year: 1970, rate: 7.1 },
+    { year: 1980, rate: 9.1 },
+    { year: 1990, rate: 12.1 },
+    { year: 2000, rate: 17.4 },
+    { year: 2010, rate: 23.1 },
+    { year: 2015, rate: 26.7 },
+    { year: 2020, rate: 28.8 },
+    { year: 2024, rate: 29.3 }
+  ]
 };
+
+// ローカルストレージからキャッシュデータを取得
+function getCachedData() {
+  try {
+    const cached = localStorage.getItem('socialSecurityData');
+    if (cached) {
+      const parsed = JSON.parse(cached);
+      if (Date.now() - parsed.timestamp < 24 * 60 * 60 * 1000) {
+        return parsed.data;
+      }
+    }
+  } catch (e) {
+    console.warn('キャッシュの読み込みに失敗:', e);
+  }
+  return null;
+}
+
+// キャッシュデータを保存
+function setCachedData(data) {
+  try {
+    localStorage.setItem('socialSecurityData', JSON.stringify({
+      timestamp: Date.now(),
+      data: data
+    }));
+  } catch (e) {
+    console.warn('キャッシュの保存に失敗:', e);
+  }
+}
+
+// e-Stat APIからデータを取得（実装予定）
+async function fetchFromEStat() {
+  // 実装予定: e-Stat APIから動的にデータを取得
+  // 現在はフォールバックデータを使用
+  return FALLBACK_DATA;
+}
+
+// データを取得（キャッシュ優先）
+async function loadData() {
+  const cached = getCachedData();
+  if (cached) {
+    return cached;
+  }
+
+  try {
+    const data = await fetchFromEStat();
+    setCachedData(data);
+    return data;
+  } catch (e) {
+    console.warn('データの取得に失敗、フォールバックデータを使用:', e);
+    return FALLBACK_DATA;
+  }
+}

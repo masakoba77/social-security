@@ -1,201 +1,194 @@
-// 依存ライブラリなしの軽量SVGチャート描画ユーティリティ
-(function () {
-  const SVG_NS = "http://www.w3.org/2000/svg";
-
-  function el(tag, attrs, children) {
-    const node = document.createElementNS(SVG_NS, tag);
-    for (const k in attrs || {}) node.setAttribute(k, attrs[k]);
-    (children || []).forEach((c) => node.appendChild(c));
-    return node;
+// グラフ描画機能
+class Chart {
+  constructor(svgElement, data, options = {}) {
+    this.svg = svgElement;
+    this.data = data;
+    this.options = {
+      width: 800,
+      height: 400,
+      margin: { top: 20, right: 30, bottom: 30, left: 60 },
+      ...options
+    };
+    this.clear();
   }
 
-  function niceMax(v) {
-    const mag = Math.pow(10, Math.floor(Math.log10(v || 1)));
-    const norm = v / mag;
-    let step;
-    if (norm <= 1) step = 1;
-    else if (norm <= 2) step = 2;
-    else if (norm <= 5) step = 5;
-    else step = 10;
-    return step * mag;
-  }
-
-  function fmtOku(v) {
-    const cho = v / 10000;
-    return (Math.round(cho * 100) / 100).toLocaleString("ja-JP") + "兆円";
-  }
-
-  function fmtPct(v) {
-    return v.toLocaleString("ja-JP") + "%";
-  }
-
-  function ensureTooltip(container) {
-    let tip = container.querySelector(".tooltip");
-    if (!tip) {
-      tip = document.createElement("div");
-      tip.className = "tooltip";
-      container.style.position = "relative";
-      container.appendChild(tip);
-    }
-    return tip;
-  }
-
-  function bindTooltip(mark, tip, container, html) {
-    mark.classList.add("mark");
-    mark.addEventListener("mouseenter", (e) => showTip(e));
-    mark.addEventListener("mousemove", (e) => showTip(e));
-    mark.addEventListener("mouseleave", () => tip.classList.remove("show"));
-    mark.addEventListener("focus", (e) => showTip(e));
-    mark.addEventListener("blur", () => tip.classList.remove("show"));
-
-    function showTip(e) {
-      tip.innerHTML = html;
-      const rect = container.getBoundingClientRect();
-      const markRect = mark.getBoundingClientRect();
-      const x = markRect.left + markRect.width / 2 - rect.left;
-      const y = markRect.top - rect.top;
-      tip.style.left = x + "px";
-      tip.style.top = Math.max(y, 24) + "px";
-      tip.classList.add("show");
+  clear() {
+    while (this.svg.firstChild) {
+      this.svg.removeChild(this.svg.firstChild);
     }
   }
 
-  function wireTableToggle(card, table) {
-    const btn = card.querySelector(".table-toggle");
-    if (!btn) return;
-    btn.addEventListener("click", () => {
-      const showing = table.classList.toggle("show");
-      btn.textContent = showing ? "グラフで見る" : "表で見る";
-    });
+  getScale(min, max, range) {
+    return range / (max - min);
   }
 
-  // 縦棒グラフ（単一系列）: 年度推移など
-  function renderVerticalBar(card, data, opts) {
-    const svg = card.querySelector("svg");
-    const W = 640, H = 300;
-    const padL = 56, padR = 16, padT = 16, padB = 44;
-    const plotW = W - padL - padR, plotH = H - padT - padB;
-    const maxVal = niceMax(Math.max(...data.map((d) => d[opts.valueKey])) * 1.15);
-    const n = data.length;
-    const bandW = plotW / n;
-    const barW = Math.min(48, bandW * 0.5);
-    const tip = ensureTooltip(card);
+  drawLineChart(xKey, yKey) {
+    const { width, height, margin } = this.options;
+    const innerWidth = width - margin.left - margin.right;
+    const innerHeight = height - margin.top - margin.bottom;
 
-    svg.setAttribute("viewBox", `0 0 ${W} ${H}`);
-    svg.innerHTML = "";
+    const yValues = this.data.map(d => d[yKey]);
+    const maxY = Math.max(...yValues);
+    const minY = Math.min(...yValues);
 
-    const gridGroup = el("g");
-    const ticks = 4;
-    for (let i = 0; i <= ticks; i++) {
-      const val = (maxVal / ticks) * i;
-      const y = padT + plotH - (val / maxVal) * plotH;
-      gridGroup.appendChild(
-        el("line", {
-          x1: padL, x2: W - padR, y1: y, y2: y,
-          stroke: "var(--grid)", "stroke-width": 1,
-        })
-      );
-      const label = el("text", {
-        x: padL - 8, y: y + 4, "text-anchor": "end",
-        fill: "var(--text-muted)", "font-size": 11,
-      });
-      label.textContent = opts.axisFormat(val);
-      gridGroup.appendChild(label);
+    const xScale = this.getScale(0, this.data.length - 1, innerWidth);
+    const yScale = this.getScale(minY, maxY, innerHeight);
+
+    // グループを作成
+    const group = document.createElementNS('http://www.w3.org/2000/svg', 'g');
+    group.setAttribute('transform', `translate(${margin.left},${margin.top})`);
+
+    // Y軸
+    const yAxis = document.createElementNS('http://www.w3.org/2000/svg', 'line');
+    yAxis.setAttribute('x1', 0);
+    yAxis.setAttribute('y1', 0);
+    yAxis.setAttribute('x2', 0);
+    yAxis.setAttribute('y2', innerHeight);
+    yAxis.setAttribute('stroke', '#ccc');
+    yAxis.setAttribute('stroke-width', 1);
+    group.appendChild(yAxis);
+
+    // X軸
+    const xAxis = document.createElementNS('http://www.w3.org/2000/svg', 'line');
+    xAxis.setAttribute('x1', 0);
+    xAxis.setAttribute('y1', innerHeight);
+    xAxis.setAttribute('x2', innerWidth);
+    xAxis.setAttribute('y2', innerHeight);
+    xAxis.setAttribute('stroke', '#ccc');
+    xAxis.setAttribute('stroke-width', 1);
+    group.appendChild(xAxis);
+
+    // ラインを描画
+    let pathData = '';
+    this.data.forEach((d, i) => {
+      const x = i * xScale;
+      const y = innerHeight - (d[yKey] - minY) * yScale;
+      pathData += (i === 0 ? 'M' : 'L') + x + ',' + y + ' ';
+    });
+
+    const path = document.createElementNS('http://www.w3.org/2000/svg', 'path');
+    path.setAttribute('d', pathData);
+    path.setAttribute('stroke', '#0066cc');
+    path.setAttribute('stroke-width', 2);
+    path.setAttribute('fill', 'none');
+    group.appendChild(path);
+
+    // ポイントを描画
+    this.data.forEach((d, i) => {
+      const x = i * xScale;
+      const y = innerHeight - (d[yKey] - minY) * yScale;
+
+      const circle = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
+      circle.setAttribute('cx', x);
+      circle.setAttribute('cy', y);
+      circle.setAttribute('r', 3);
+      circle.setAttribute('fill', '#0066cc');
+      group.appendChild(circle);
+    });
+
+    // Y軸ラベル
+    for (let i = 0; i <= 5; i++) {
+      const y = (innerHeight / 5) * i;
+      const value = maxY - (maxY - minY) * (i / 5);
+
+      const text = document.createElementNS('http://www.w3.org/2000/svg', 'text');
+      text.setAttribute('x', -40);
+      text.setAttribute('y', y + 5);
+      text.setAttribute('font-size', '12px');
+      text.setAttribute('text-anchor', 'end');
+      text.setAttribute('fill', '#666');
+      text.textContent = value.toFixed(1);
+      group.appendChild(text);
     }
-    svg.appendChild(gridGroup);
 
-    svg.appendChild(
-      el("line", {
-        x1: padL, x2: W - padR, y1: padT + plotH, y2: padT + plotH,
-        stroke: "var(--baseline)", "stroke-width": 1,
-      })
-    );
-
-    data.forEach((d, i) => {
-      const val = d[opts.valueKey];
-      const barH = (val / maxVal) * plotH;
-      const cx = padL + bandW * i + bandW / 2;
-      const x = cx - barW / 2;
-      const y = padT + plotH - barH;
-      const r = 4;
-      const color = opts.color(d, i);
-
-      const path = el("path", {
-        d: `M${x},${y + r} a${r},${r} 0 0 1 ${r},-${r} h${barW - 2 * r} a${r},${r} 0 0 1 ${r},${r} v${barH - r} h${-barW} z`,
-        fill: color,
-      });
-      bindTooltip(path, tip, card, `<strong>${d.label.replace("\n", " ")}</strong><br>${opts.tooltip(d)}`);
-      svg.appendChild(path);
-
-      if (opts.directLabel) {
-        const t = el("text", {
-          x: cx, y: y - 8, "text-anchor": "middle",
-          fill: "var(--text-primary)", "font-size": 12, "font-weight": 600,
-        });
-        t.textContent = opts.directLabel(d);
-        svg.appendChild(t);
-      }
-
-      String(d.label).split("\n").forEach((line, li) => {
-        const t = el("text", {
-          x: cx, y: padT + plotH + 18 + li * 13, "text-anchor": "middle",
-          fill: "var(--text-secondary)", "font-size": 11.5,
-        });
-        t.textContent = line;
-        svg.appendChild(t);
-      });
-    });
+    this.svg.appendChild(group);
   }
 
-  // 横棒グラフ（比較・強調用）: 予算内訳など
-  function renderHorizontalBar(card, data, opts) {
-    const svg = card.querySelector("svg");
-    const rowH = 34;
-    const W = 640;
-    const H = data.length * rowH + 20;
-    const padL = 8, padR = 90, labelW = opts.labelWidth || 190;
-    const plotW = W - padL - padR - labelW;
-    const maxVal = Math.max(...data.map((d) => d[opts.valueKey])) * 1.08;
-    const tip = ensureTooltip(card);
+  drawBarChart(xKey, yKey) {
+    const { width, height, margin } = this.options;
+    const innerWidth = width - margin.left - margin.right;
+    const innerHeight = height - margin.top - margin.bottom;
 
-    svg.setAttribute("viewBox", `0 0 ${W} ${H}`);
-    svg.innerHTML = "";
+    const yValues = this.data.map(d => d[yKey]);
+    const maxY = Math.max(...yValues);
 
-    data.forEach((d, i) => {
-      const val = d[opts.valueKey];
-      const barW = (val / maxVal) * plotW;
-      const y = 10 + i * rowH;
-      const barH = 20;
-      const r = 4;
-      const x0 = padL + labelW;
-      const color = opts.color(d, i);
+    const barWidth = innerWidth / (this.data.length * 1.5);
+    const scale = innerHeight / maxY;
 
-      const label = el("text", {
-        x: padL, y: y + barH / 2 + 4, "text-anchor": "start",
-        fill: d.highlight ? "var(--text-primary)" : "var(--text-secondary)",
-        "font-size": 12.5, "font-weight": d.highlight ? 600 : 400,
-      });
-      label.textContent = d.label;
-      svg.appendChild(label);
+    // グループを作成
+    const group = document.createElementNS('http://www.w3.org/2000/svg', 'g');
+    group.setAttribute('transform', `translate(${margin.left},${margin.top})`);
 
-      let dAttr;
-      if (barW > r) {
-        dAttr = `M${x0},${y} h${barW - r} a${r},${r} 0 0 1 ${r},${r} v${barH - 2 * r} a${r},${r} 0 0 1 ${-r},${r} h${-(barW - r)} z`;
-      } else {
-        dAttr = `M${x0},${y} h${barW} v${barH} h${-barW} z`;
-      }
-      const path = el("path", { d: dAttr, fill: color });
-      bindTooltip(path, tip, card, `<strong>${d.label}</strong><br>${opts.tooltip(d)}`);
-      svg.appendChild(path);
+    // 軸を描画
+    const yAxis = document.createElementNS('http://www.w3.org/2000/svg', 'line');
+    yAxis.setAttribute('x1', 0);
+    yAxis.setAttribute('y1', 0);
+    yAxis.setAttribute('x2', 0);
+    yAxis.setAttribute('y2', innerHeight);
+    yAxis.setAttribute('stroke', '#ccc');
+    group.appendChild(yAxis);
 
-      const valText = el("text", {
-        x: x0 + barW + 8, y: y + barH / 2 + 4, "text-anchor": "start",
-        fill: "var(--text-primary)", "font-size": 12, "font-weight": d.highlight ? 600 : 400,
-      });
-      valText.textContent = opts.directLabel(d);
-      svg.appendChild(valText);
+    const xAxis = document.createElementNS('http://www.w3.org/2000/svg', 'line');
+    xAxis.setAttribute('x1', 0);
+    xAxis.setAttribute('y1', innerHeight);
+    xAxis.setAttribute('x2', innerWidth);
+    xAxis.setAttribute('y2', innerHeight);
+    xAxis.setAttribute('stroke', '#ccc');
+    group.appendChild(xAxis);
+
+    // バーを描画
+    const colors = ['#0066cc', '#ff6b35', '#4caf50', '#ff9800'];
+    this.data.forEach((d, i) => {
+      const x = (barWidth * 1.5) * i;
+      const barHeight = d[yKey] * scale;
+      const y = innerHeight - barHeight;
+
+      const rect = document.createElementNS('http://www.w3.org/2000/svg', 'rect');
+      rect.setAttribute('x', x);
+      rect.setAttribute('y', y);
+      rect.setAttribute('width', barWidth);
+      rect.setAttribute('height', barHeight);
+      rect.setAttribute('fill', colors[i % colors.length]);
+      group.appendChild(rect);
+
+      // ラベル
+      const text = document.createElementNS('http://www.w3.org/2000/svg', 'text');
+      text.setAttribute('x', x + barWidth / 2);
+      text.setAttribute('y', innerHeight + 15);
+      text.setAttribute('font-size', '12px');
+      text.setAttribute('text-anchor', 'middle');
+      text.setAttribute('fill', '#333');
+      text.textContent = d[xKey].substring(0, 6);
+      group.appendChild(text);
+
+      // 値ラベル
+      const valueText = document.createElementNS('http://www.w3.org/2000/svg', 'text');
+      valueText.setAttribute('x', x + barWidth / 2);
+      valueText.setAttribute('y', y - 5);
+      valueText.setAttribute('font-size', '11px');
+      valueText.setAttribute('text-anchor', 'middle');
+      valueText.setAttribute('fill', '#333');
+      valueText.textContent = d[yKey].toFixed(1);
+      group.appendChild(valueText);
     });
-  }
 
-  window.Charts = { renderVerticalBar, renderHorizontalBar, wireTableToggle, fmtOku, fmtPct };
-})();
+    this.svg.appendChild(group);
+  }
+}
+
+// グラフを描画する関数
+function renderChart(elementId, data, type, xKey, yKey) {
+  const svg = document.getElementById(elementId);
+  if (!svg) return;
+
+  const chart = new Chart(svg, data, {
+    width: svg.parentElement.offsetWidth,
+    height: 400
+  });
+
+  if (type === 'line') {
+    chart.drawLineChart(xKey, yKey);
+  } else if (type === 'bar') {
+    chart.drawBarChart(xKey, yKey);
+  }
+}
