@@ -15,12 +15,16 @@
   renderChart('trend-chart', data.trends, 'line', 'year', 'benefit');
   renderChart('breakdown-chart', data.breakdown, 'bar', 'category', 'amount');
   renderChart('budget-chart', data.budget, 'bar', 'category', 'amount');
+  renderChart('details-chart', data.benefitDetails, 'bar', 'category', 'amount');
+  renderChart('category-chart', data.benefitTrends, 'line', 'year', 'pension');
   renderChart('aging-chart', data.agingRate, 'line', 'year', 'rate');
 
   // テーブルを表示
   renderTrendTable(data.trends);
   renderBreakdownTable(data.breakdown);
   renderBudgetTable(data.budget);
+  renderDetailsTable(data.benefitDetails);
+  renderCategoryTable(data.benefitTrends);
   renderAgingTable(data.agingRate);
 })();
 
@@ -73,6 +77,39 @@ function renderBudgetTable(budget) {
       <td>${d.category}</td>
       <td>${d.amount.toFixed(1)}</td>
       <td>${d.ratio.toFixed(1)}</td>
+    `;
+    tbody.appendChild(row);
+  });
+}
+
+function renderDetailsTable(details) {
+  const tbody = document.getElementById('details-tbody');
+  tbody.innerHTML = '';
+
+  details.forEach(d => {
+    const row = document.createElement('tr');
+    row.innerHTML = `
+      <td>${d.category}</td>
+      <td>${d.subcategory}</td>
+      <td>${d.amount.toFixed(1)}</td>
+      <td>${d.ratio.toFixed(1)}</td>
+    `;
+    tbody.appendChild(row);
+  });
+}
+
+function renderCategoryTable(trends) {
+  const tbody = document.getElementById('category-tbody');
+  tbody.innerHTML = '';
+
+  trends.forEach(d => {
+    const row = document.createElement('tr');
+    row.innerHTML = `
+      <td>${d.year}年度</td>
+      <td>${d.pension.toFixed(1)}</td>
+      <td>${d.medical.toFixed(1)}</td>
+      <td>${d.care.toFixed(1)}</td>
+      <td>${d.welfare.toFixed(1)}</td>
     `;
     tbody.appendChild(row);
   });

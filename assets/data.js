@@ -42,6 +42,27 @@ const FALLBACK_DATA = {
     { year: 2015, rate: 26.7 },
     { year: 2020, rate: 28.8 },
     { year: 2024, rate: 29.3 }
+  ],
+
+  // 社会保障給付費の詳細内訳
+  benefitDetails: [
+    { category: "老齢年金", subcategory: "年金", amount: 35.2, ratio: 25.5 },
+    { category: "医療保険給付", subcategory: "医療", amount: 28.1, ratio: 20.3 },
+    { category: "介護保険給付", subcategory: "介護", amount: 15.8, ratio: 11.4 },
+    { category: "障害年金・遺族年金", subcategory: "年金", amount: 8.4, ratio: 6.1 },
+    { category: "児童手当・育児休業給付", subcategory: "福祉・その他", amount: 4.2, ratio: 3.0 },
+    { category: "生活保護給付", subcategory: "福祉・その他", amount: 3.8, ratio: 2.7 },
+    { category: "後期高齢者医療", subcategory: "医療", amount: 13.2, ratio: 9.5 },
+    { category: "その他福祉給付", subcategory: "福祉・その他", amount: 9.6, ratio: 6.9 }
+  ],
+
+  // カテゴリー別の推移（年度別）
+  benefitTrends: [
+    { year: 2020, pension: 43.2, medical: 38.5, care: 14.1, welfare: 18.9 },
+    { year: 2021, pension: 44.1, medical: 39.2, care: 14.5, welfare: 19.3 },
+    { year: 2022, pension: 44.8, medical: 39.8, care: 14.9, welfare: 19.8 },
+    { year: 2023, pension: 45.3, medical: 40.2, care: 15.3, welfare: 20.1 },
+    { year: 2024, pension: 45.8, medical: 40.6, care: 15.8, welfare: 20.5 }
   ]
 };
 
